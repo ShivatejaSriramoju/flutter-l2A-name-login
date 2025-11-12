@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'L2-A Login → Dashboard',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+      home: const LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _goToDashboard() {
+    if (_formKey.currentState!.validate()) {
+      final name = _nameController.text.trim();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DashboardPage(name: name),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Enter your name',
+                style: TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+                textInputAction: TextInputAction.done,
+                validator: (value) {
+                  final v = value?.trim() ?? '';
+                  if (v.isEmpty) return 'Please enter your name';
+                  if (v.length > 30) return 'Keep it under 30 characters';
+                  return null;
+                },
+                onFieldSubmitted: (_) => _goToDashboard(),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _goToDashboard,
+                child: const Text('Continue'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DashboardPage extends StatelessWidget {
+  final String name;
+  const DashboardPage({super.key, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Dashboard')),
+      body: Center(
+        child: Text(
+          'Welcome, $name!',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
